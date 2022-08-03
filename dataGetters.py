@@ -1,5 +1,5 @@
 import requests
-from helpers import *
+from helpers import definirAno
 from bs4 import BeautifulSoup
 
 def getDataGPI2022():
@@ -19,7 +19,7 @@ def getDataGPI2022():
                     contador += 1
                     continue
                 elif contador == 3:
-                    dadosGPI[pais] = dados.text.strip()
+                    dadosGPI[pais] = float(dados.text.strip())
                     contador = 1
         return dadosGPI
 
@@ -58,3 +58,14 @@ def getDataGPIPast():
                     contador=0
     return dadosGPI
 
+def getPaises():
+    url = 'https://en.wikipedia.org/wiki/Global_Peace_Index#Global_Peace_Index_rankings_(2008%E2%80%932019'
+    req = requests.get(url)
+    nomes = list()
+    if req.status_code == 200:
+        soup = BeautifulSoup(req.text, "html.parser")
+        peaceIndexTable = soup.find_all("table", class_ = "wikitable sortable")[1]
+        peaceIndexTable = peaceIndexTable.find("tbody")
+        for info_country in peaceIndexTable.find_all("tr")[1:]:
+            nomes.append(info_country.find("td").text.strip())
+    return nomes
